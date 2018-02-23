@@ -1,0 +1,484 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>AssignmentP1</title><meta name="generator" content="MATLAB 9.2"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2018-02-23"><meta name="DC.source" content="AssignmentP1.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#2">Part 1: Question A</a></li><li><a href="#3">Part 1: Question B - Finite Difference</a></li><li><a href="#4">Part 1: Question B - Analytical Series Solution</a></li><li><a href="#5">Summary:</a></li></ul></div><pre class="codeinput"><span class="comment">%%Assignment 2: Part 1</span>
+<span class="comment">%Laplace equations will be solved in this part using finite difference.</span>
+</pre><h2 id="2">Part 1: Question A</h2><pre class="codeinput"><span class="comment">%First section of this part will solve for the voltage across a frame where</span>
+<span class="comment">%one boundary is set to a fixed 1 volt and the opposing edge of the frame</span>
+<span class="comment">%is set to a fixed 0 volts. This problem was solved in an earlier PA</span>
+<span class="comment">%session using an iteration method.</span>
+
+clc
+
+<span class="comment">%Set dimensions of frame (frame ratio is L/W = 3/2)</span>
+L=30;
+ny=L;
+nx=2*L/3;
+
+<span class="comment">%Fixed Voltage will be 1 volt</span>
+vx=1;
+
+<span class="comment">%Create G matrix. Each row of this matrix corresponds to a single element</span>
+<span class="comment">%in the physical matrix (think iteration method approach). However the rest</span>
+<span class="comment">%of the row corresponds to every other element in the physical matrix with</span>
+<span class="comment">%respect to the identified point.</span>
+G=sparse(nx*ny,nx*ny);
+
+<span class="comment">%Boundary Conditions</span>
+v=zeros(1,nx*ny);
+
+<span class="comment">%Construct G matrix, go up each column from point (0,0), then move over to</span>
+<span class="comment">%next column. Continue till you reach final element at the top right of matrix</span>
+<span class="comment">%with a position of(nx,ny) in the nx*ny position.</span>
+<span class="keyword">for</span> i=1:nx
+
+    <span class="keyword">for</span> j = 1:ny
+
+        n=j+(i-1)*ny;
+
+        <span class="keyword">if</span>(i==1)
+           G(n,:)=0;
+           G(n,n)=1;
+           v(n)=vx;
+
+        <span class="keyword">elseif</span>(i==nx)
+           G(n,:)=0;
+           G(n,n)=1;
+           v(n)=0;
+
+        <span class="keyword">elseif</span>(j==1)
+            G(n,:)=0;
+            G(n,n)=-3;
+            G(n,n+1)=1;
+            G(n,n-ny)=1;
+            G(n,n+ny)=1;
+
+       <span class="keyword">elseif</span>(j==ny)
+            G(n,:)=0;
+            G(n,n)=-3;
+            G(n,n-1)=1;
+            G(n,n-ny)=1;
+            G(n,n+ny)=1;
+
+        <span class="keyword">else</span>
+            G(n,:)=0;
+            G(n,n)=-4;
+            G(n,n-1)=1;
+            G(n,n+1)=1;
+            G(n,n-ny)=1;
+            G(n,n+ny)=1;
+
+        <span class="keyword">end</span>
+
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+temp=G\v';
+
+<span class="comment">%Backmap 'temp' vector into a physical matrix called vmap, same element-by-</span>
+<span class="comment">%element approach as what was used in the g-matrix construction.</span>
+
+vmap=zeros(nx,ny);
+
+<span class="keyword">for</span> i=1:nx
+
+    <span class="keyword">for</span> j=1:ny
+
+        n=j+(i-1)*ny;
+        vmap(i,j)=temp(n);
+
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+
+<span class="comment">%Part 1: Question A Plot</span>
+figure(1)
+surf(vmap)
+title(<span class="string">"VMAP Part 1: Question A"</span>)
+</pre><img vspace="5" hspace="5" src="AssignmentP1_01.png" alt=""> <h2 id="3">Part 1: Question B - Finite Difference</h2><pre class="codeinput"><span class="comment">%This section of part 1 is similar to question A except now the two edges</span>
+<span class="comment">%that weren't fixed in question A are now fixed at 0. The two boundaries</span>
+<span class="comment">%that were fixed in question A are now both equal to 1 volt. The finite</span>
+<span class="comment">%difference approach was used again. This problem was also solved in a PA</span>
+<span class="comment">%using the iteration method.</span>
+
+<span class="comment">%Size of frame</span>
+L=30;
+ny=L;
+nx=2*L/3;
+
+<span class="comment">%Fixed voltage value</span>
+vx=1;
+
+<span class="comment">%Generate the size of frame</span>
+G=sparse(nx*ny,nx*ny);
+v=zeros(1,nx*ny);
+
+<span class="keyword">for</span> i=1:nx
+   <span class="keyword">for</span> j = 1:ny
+       n=j+(i-1)*ny;
+
+       <span class="keyword">if</span>(i==1)
+           G(n,:)=0;
+           G(n,n)=1;
+           v(n)=vx;
+
+       <span class="keyword">elseif</span>(i==nx)
+           G(n,:)=0;
+           G(n,n)=1;
+           v(n)=vx;
+
+       <span class="keyword">elseif</span>(j==1)
+           G(n,:)=0;
+           G(n,n)=1;
+
+       <span class="keyword">elseif</span>(j==ny)
+           G(n,:)=0;
+           G(n,n)=1;
+
+       <span class="keyword">else</span>
+            G(n,:)=0;
+            G(n,n)=-4;
+            G(n,n-1)=1;
+            G(n,n+1)=1;
+            G(n,n-ny)=1;
+            G(n,n+ny)=1;
+
+       <span class="keyword">end</span>
+   <span class="keyword">end</span>
+<span class="keyword">end</span>
+
+temp=G\v';
+
+<span class="comment">%Backmap the 'temp' vector into the physical matrix.</span>
+vmap=zeros(nx,ny);
+<span class="keyword">for</span> i=1:nx
+
+    <span class="keyword">for</span> j=1:ny
+         n=j+(i-1)*ny;
+         vmap(i,j)=temp(n);
+
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+
+<span class="comment">%Plot of Part 1 Question B (Finite Difference Approach)</span>
+figure(2)
+surf(vmap)
+title(<span class="string">"VMAP Part1 Question B with Finite Difference"</span>)
+</pre><img vspace="5" hspace="5" src="AssignmentP1_02.png" alt=""> <h2 id="4">Part 1: Question B - Analytical Series Solution</h2><pre class="codeinput">physical=zeros(30,20);
+a=30;
+b=10;<span class="comment">%Half of the width of frame</span>
+
+x=linspace(-10,10,20);
+y=linspace(0,30,30);
+[xx,yy]=meshgrid(x,y);
+
+<span class="comment">%Part 1 Question C Plot</span>
+figure(3)
+<span class="keyword">for</span> n=1:2:650
+    physical=(physical+(cosh(n*pi*xx/a).*sin(n*pi*yy/a))./(n*cosh(n*pi*b/a)));
+
+    <span class="comment">%Plot simulation as it converges to a solution</span>
+    surf(x,y,(4*vx/pi)*physical)
+    title(<span class="string">"VMAP Analytical Series Solution"</span>)
+    pause(0.01)
+
+<span class="keyword">end</span>
+
+<span class="comment">%Only 650 iterations could be performed. After this number of iterations</span>
+<span class="comment">%MATLAB is no longer capable of accuratly calculating the 'cosh' in the denominator</span>
+<span class="comment">%and distorts the solution.</span>
+</pre><img vspace="5" hspace="5" src="AssignmentP1_03.png" alt=""> <h2 id="5">Summary:</h2><pre class="codeinput"><span class="comment">%The first part of this problem worked succesfully. As expected the voltage</span>
+<span class="comment">%increased linearly from 0 volt on one boundary to 1 volt on the opposing</span>
+<span class="comment">%edge.</span>
+<span class="comment">%</span>
+<span class="comment">%The second question was simulated properly. Since each boundary was fixed,</span>
+<span class="comment">%the final simulation was very different than what was seen in question 'a'.</span>
+<span class="comment">%As a result the simulation produced a plot with a saddle point (local max</span>
+<span class="comment">%in one direction and a local min in other direction) at the centre. This was</span>
+<span class="comment">%also observed using the iteration approach in the PA session</span>
+<span class="comment">%</span>
+<span class="comment">%The analytical solution converged to a solution that was very similar to</span>
+<span class="comment">%what was seen using the finite difference approach. However the</span>
+<span class="comment">%coordinates had to be adjusted. Instead of spanning from 0 to 20, the</span>
+<span class="comment">%solution spanned from -10 to +10 along the x-axis. The finite difference</span>
+<span class="comment">%approach could require a greater amount of memory however it is computed</span>
+<span class="comment">%extrememely quickly. Both of these approaches are far superior to using</span>
+<span class="comment">%the iteration method (used in the PA session).</span>
+</pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2017a</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%%Assignment 2: Part 1
+%Laplace equations will be solved in this part using finite difference.
+%% Part 1: Question A
+%First section of this part will solve for the voltage across a frame where
+%one boundary is set to a fixed 1 volt and the opposing edge of the frame
+%is set to a fixed 0 volts. This problem was solved in an earlier PA
+%session using an iteration method. 
+
+clc
+
+%Set dimensions of frame (frame ratio is L/W = 3/2)
+L=30;
+ny=L;
+nx=2*L/3;
+
+%Fixed Voltage will be 1 volt
+vx=1;
+
+%Create G matrix. Each row of this matrix corresponds to a single element
+%in the physical matrix (think iteration method approach). However the rest
+%of the row corresponds to every other element in the physical matrix with
+%respect to the identified point.
+G=sparse(nx*ny,nx*ny);
+
+%Boundary Conditions
+v=zeros(1,nx*ny);
+
+%Construct G matrix, go up each column from point (0,0), then move over to
+%next column. Continue till you reach final element at the top right of matrix
+%with a position of(nx,ny) in the nx*ny position.
+for i=1:nx
+   
+    for j = 1:ny
+       
+        n=j+(i-1)*ny;      
+       
+        if(i==1) 
+           G(n,:)=0;
+           G(n,n)=1;
+           v(n)=vx;
+       
+        elseif(i==nx)
+           G(n,:)=0;
+           G(n,n)=1;
+           v(n)=0;
+       
+        elseif(j==1)
+            G(n,:)=0;
+            G(n,n)=-3;
+            G(n,n+1)=1;
+            G(n,n-ny)=1;
+            G(n,n+ny)=1;
+      
+       elseif(j==ny)
+            G(n,:)=0;
+            G(n,n)=-3;
+            G(n,n-1)=1;
+            G(n,n-ny)=1;
+            G(n,n+ny)=1;
+       
+        else
+            G(n,:)=0;
+            G(n,n)=-4;
+            G(n,n-1)=1;
+            G(n,n+1)=1;
+            G(n,n-ny)=1;
+            G(n,n+ny)=1;
+       
+        end
+        
+    end
+end
+temp=G\v';
+
+%Backmap 'temp' vector into a physical matrix called vmap, same element-by-
+%element approach as what was used in the g-matrix construction.
+
+vmap=zeros(nx,ny);
+
+for i=1:nx
+    
+    for j=1:ny
+         
+        n=j+(i-1)*ny;
+        vmap(i,j)=temp(n);   
+        
+    end
+end
+
+%Part 1: Question A Plot
+figure(1)
+surf(vmap)
+title("VMAP Part 1: Question A")
+
+
+%% Part 1: Question B - Finite Difference 
+%This section of part 1 is similar to question A except now the two edges
+%that weren't fixed in question A are now fixed at 0. The two boundaries
+%that were fixed in question A are now both equal to 1 volt. The finite
+%difference approach was used again. This problem was also solved in a PA
+%using the iteration method.
+
+%Size of frame
+L=30;
+ny=L;
+nx=2*L/3;
+
+%Fixed voltage value
+vx=1;
+
+%Generate the size of frame 
+G=sparse(nx*ny,nx*ny);
+v=zeros(1,nx*ny);
+
+for i=1:nx
+   for j = 1:ny
+       n=j+(i-1)*ny;  
+       
+       if(i==1)
+           G(n,:)=0;
+           G(n,n)=1;
+           v(n)=vx;
+           
+       elseif(i==nx)
+           G(n,:)=0;
+           G(n,n)=1;
+           v(n)=vx;
+           
+       elseif(j==1)
+           G(n,:)=0;
+           G(n,n)=1;
+           
+       elseif(j==ny)
+           G(n,:)=0;
+           G(n,n)=1;
+           
+       else
+            G(n,:)=0;
+            G(n,n)=-4;
+            G(n,n-1)=1;
+            G(n,n+1)=1;
+            G(n,n-ny)=1;
+            G(n,n+ny)=1;
+            
+       end
+   end
+end
+
+temp=G\v';
+
+%Backmap the 'temp' vector into the physical matrix. 
+vmap=zeros(nx,ny);
+for i=1:nx
+    
+    for j=1:ny
+         n=j+(i-1)*ny;
+         vmap(i,j)=temp(n);  
+         
+    end
+end
+
+%Plot of Part 1 Question B (Finite Difference Approach)
+figure(2)
+surf(vmap)
+title("VMAP Part1 Question B with Finite Difference")
+
+%% Part 1: Question B - Analytical Series Solution
+
+physical=zeros(30,20);
+a=30;
+b=10;%Half of the width of frame
+
+x=linspace(-10,10,20);
+y=linspace(0,30,30);
+[xx,yy]=meshgrid(x,y);
+
+%Part 1 Question C Plot
+figure(3)
+for n=1:2:650
+    physical=(physical+(cosh(n*pi*xx/a).*sin(n*pi*yy/a))./(n*cosh(n*pi*b/a)));
+    
+    %Plot simulation as it converges to a solution
+    surf(x,y,(4*vx/pi)*physical) 
+    title("VMAP Analytical Series Solution")
+    pause(0.01)
+    
+end
+
+%Only 650 iterations could be performed. After this number of iterations
+%MATLAB is no longer capable of accuratly calculating the 'cosh' in the denominator
+%and distorts the solution.
+
+%% Summary:
+%The first part of this problem worked succesfully. As expected the voltage
+%increased linearly from 0 volt on one boundary to 1 volt on the opposing
+%edge.
+%
+%The second question was simulated properly. Since each boundary was fixed,
+%the final simulation was very different than what was seen in question 'a'.
+%As a result the simulation produced a plot with a saddle point (local max
+%in one direction and a local min in other direction) at the centre. This was
+%also observed using the iteration approach in the PA session
+%
+%The analytical solution converged to a solution that was very similar to
+%what was seen using the finite difference approach. However the
+%coordinates had to be adjusted. Instead of spanning from 0 to 20, the
+%solution spanned from -10 to +10 along the x-axis. The finite difference 
+%approach could require a greater amount of memory however it is computed
+%extrememely quickly. Both of these approaches are far superior to using
+%the iteration method (used in the PA session). 
+
+##### SOURCE END #####
+--></body></html>

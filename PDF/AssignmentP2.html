@@ -1,0 +1,470 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>AssignmentP2</title><meta name="generator" content="MATLAB 9.2"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2018-02-23"><meta name="DC.source" content="AssignmentP2.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#2">Part 2: Question A</a></li><li><a href="#3">1. Distribution of conductivity in material</a></li><li><a href="#4">2. Build G matrix and plot Voltage Map</a></li><li><a href="#5">3.Electric Field</a></li><li><a href="#6">4. Current Density</a></li><li><a href="#7">Summary</a></li></ul></div><pre class="codeinput"><span class="comment">%%Assignment 2: Part 2</span>
+<span class="comment">%Laplace equations will be solved in this part using finite difference.</span>
+</pre><h2 id="2">Part 2: Question A</h2><pre class="codeinput"><span class="comment">%The first section of this part will solve for the voltage across a frame where</span>
+<span class="comment">%one boundary is set to a fixed 1 volt and the opposing edge of the frame</span>
+<span class="comment">%is set to a fixed 0 volts. However we have heterogeneous material where</span>
+<span class="comment">%the conductivity changes. Two boxes will be in the frame with a</span>
+<span class="comment">%conductivity less than the conductivity outside of the box.</span>
+
+clc
+
+<span class="comment">%Set Frame Size</span>
+
+L=30;
+nx = 2*L/3;
+ny = L;
+
+<span class="comment">%Voltage at boundary</span>
+vx=1;
+
+G = sparse(nx*ny);
+v = zeros(1,nx*ny);
+
+<span class="comment">%Conductivity outside either box</span>
+sig1 = 1;
+<span class="comment">%Conductivity inside a box</span>
+sig2 = 1e-2;
+
+<span class="comment">%Establish dimensions of each box</span>
+
+<span class="comment">% [Left side, right side, top of box, bottom of box]</span>
+
+box1 = [nx*2/5 nx*3/5 ny ny*3/5];
+box2 = [nx*2/5 nx*3/5 ny*2/5 0];
+</pre><h2 id="3">1. Distribution of conductivity in material</h2><pre class="codeinput">sigma=ones(nx,ny);
+<span class="keyword">for</span> i=1:nx
+    <span class="keyword">for</span> j=1:ny
+        <span class="keyword">if</span>(i &gt; box1(1) &amp;&amp; i &lt; box1(2) &amp;&amp; (j &lt; box2(3)||j &gt; box1(4)))
+            sigma(i,j)=1e-2;
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+
+<span class="comment">%Plot #1: Conductivity in Frame</span>
+figure(1)
+surface(sigma)
+title(<span class="string">'Part2: Sigma Plot'</span>)
+</pre><img vspace="5" hspace="5" src="AssignmentP2_01.png" alt=""> <h2 id="4">2. Build G matrix and plot Voltage Map</h2><pre class="codeinput"><span class="keyword">for</span> i=1:nx
+   <span class="keyword">for</span> j = 1:ny <span class="comment">%Along fixed boundary (left side)</span>
+       n=j+(i-1)*ny;
+
+       <span class="keyword">if</span>(i==1)
+           G(n,:)=0;
+           G(n,n)=1;
+           v(n)=vx;
+
+       <span class="keyword">elseif</span>(i==nx)<span class="comment">%Along fixed boundary (right side)</span>
+           G(n,:)=0;
+           G(n,n)=1;
+           v(n)=0;
+
+       <span class="keyword">elseif</span> (j == 1) <span class="comment">%Along unfixed boundary (bottom)</span>
+
+           <span class="keyword">if</span> (i &gt; box1(1) &amp;&amp; i &lt; box1(2)) <span class="comment">%Inside Box</span>
+                G(n, n) = -3;
+                G(n, n+1) = sig2;
+                G(n, n+ny) = sig2;
+                G(n, n-ny) = sig2;
+
+            <span class="keyword">else</span> <span class="comment">%Outside box</span>
+                G(n, n) = -3;
+                G(n, n+1) = sig1;
+                G(n, n+ny) = sig1;
+                G(n, n-ny) = sig1;
+
+            <span class="keyword">end</span>
+       <span class="keyword">elseif</span> (j == ny) <span class="comment">%Along unfixed boundary (top)</span>
+
+           <span class="keyword">if</span> (i &gt; box1(1) &amp;&amp; i &lt; box1(2)) <span class="comment">%Inside Box</span>
+                G(n, n) = -3;
+                G(n, n-1) = sig2;
+                G(n, n+ny) = sig2;
+                G(n, n-ny) = sig2;
+
+           <span class="keyword">else</span> <span class="comment">%Outside Box</span>
+                G(n, n) = -3;
+                G(n, n-1) = sig1;
+                G(n, n+ny) = sig1;
+                G(n, n-ny) = sig1;
+
+           <span class="keyword">end</span>
+
+       <span class="keyword">else</span> <span class="comment">%Not along any boundary, in the middle of the frame</span>
+
+           <span class="keyword">if</span> (i &gt; box1(1) &amp;&amp; i &lt; box1(2) &amp;&amp; (j &lt; box2(3)||j &gt; box1(4)))
+               <span class="comment">%Inside a box</span>
+                G(n, n) = -4;
+                G(n, n+1) = sig2;
+                G(n, n-1) = sig2;
+                G(n, n+ny) = sig2;
+                G(n, n-ny) = sig2;
+
+            <span class="keyword">else</span> <span class="comment">%Outside a box</span>
+                G(n, n) = -4;
+                G(n, n+1) = sig1;
+                G(n, n-1) = sig1;
+                G(n, n+ny) = sig1;
+                G(n, n-ny) = sig1;
+
+           <span class="keyword">end</span>
+
+       <span class="keyword">end</span>
+
+   <span class="keyword">end</span>
+<span class="keyword">end</span>
+<span class="comment">%G matrix made</span>
+<span class="comment">%Solve for solution</span>
+temp=G\v';
+
+<span class="comment">%Backmap 'temp' vector into a physical (readable) matrix</span>
+vmap=zeros(nx,ny);
+<span class="keyword">for</span> i=1:nx
+
+    <span class="keyword">for</span> j=1:ny
+         n=j+(i-1)*ny;
+         vmap(i,j)=temp(n);
+
+    <span class="keyword">end</span>
+
+<span class="keyword">end</span>
+
+<span class="comment">%Plot the voltage map of frame</span>
+figure(2)
+surf(vmap)
+title(<span class="string">"Part 2: Voltage Map across Frame"</span>)
+</pre><img vspace="5" hspace="5" src="AssignmentP2_02.png" alt=""> <h2 id="5">3.Electric Field</h2><pre class="codeinput"><span class="comment">%Electric Field is the gradient of the voltage</span>
+<span class="comment">%Generate two matrices, each contains the gradient with respect to a</span>
+<span class="comment">%direction</span>
+[Ex,Ey]=gradient(vmap);
+
+<span class="comment">%Plot X-coordinate Electric Field</span>
+figure(3)
+surface(Ex)
+title(<span class="string">'X-Coordinate Electric Field'</span>)
+
+<span class="comment">%Plot the Y-coordinate Electric Field</span>
+figure(4)
+surface(Ey)
+title(<span class="string">'Y-Coordinate Electric Field'</span>)
+
+<span class="comment">%Combine the X- and Y- electric field with quiver, shows direction</span>
+<span class="comment">%(magnitude isnt as obvious however)</span>
+figure(5)
+quiver(Ex,Ey)
+title(<span class="string">'Electric Field'</span>)
+axis <span class="string">tight</span>
+</pre><img vspace="5" hspace="5" src="AssignmentP2_03.png" alt=""> <img vspace="5" hspace="5" src="AssignmentP2_04.png" alt=""> <img vspace="5" hspace="5" src="AssignmentP2_05.png" alt=""> <h2 id="6">4. Current Density</h2><pre class="codeinput"><span class="comment">%Current is electric field multiplied by conductivity</span>
+<span class="comment">%Solve for current in x-direction</span>
+Jx=Ex.*sigma;
+
+<span class="comment">%Solve for current in y-direction</span>
+Jy=Ey.*sigma;
+
+<span class="comment">%'quiver-plot' of the currents</span>
+figure(6)
+quiver(Jx,Jy)
+title(<span class="string">'Quiver Current Density Through Frame'</span>)
+axis <span class="string">tight</span>
+
+<span class="comment">%Jx and Jy are orthogonal</span>
+<span class="comment">%Plot the total magnitude of the currents</span>
+Jtotal=(Jx.^2+Jy.^2).^0.5;
+figure(7)
+surface(Jtotal)
+title(<span class="string">'Surface Plot of Current Density Magnitude (No Direction Indicated)'</span>)
+axis <span class="string">tight</span>
+</pre><img vspace="5" hspace="5" src="AssignmentP2_06.png" alt=""> <img vspace="5" hspace="5" src="AssignmentP2_07.png" alt=""> <h2 id="7">Summary</h2><pre class="codeinput"><span class="comment">%As expected for the conductivity map, the conductivity is uniform through</span>
+<span class="comment">%the entire frame except at the two boxes. At the two boxes, the</span>
+<span class="comment">%conductivity drops to 1e-2</span>
+<span class="comment">%</span>
+<span class="comment">%The voltage map is similar to what was seen in part 1 question 'a' as</span>
+<span class="comment">%there is a linear increasing voltage from one boundary to the next.</span>
+<span class="comment">%However the presence of the two boxes disrupts the uniformity. The voltage</span>
+<span class="comment">%increases in a parabolic shape between the two boxes .</span>
+<span class="comment">%</span>
+<span class="comment">%The electric (x- and y-) fields represents the gradient of the voltage</span>
+<span class="comment">%field. The quiver of the two plots show that the electric field lines</span>
+<span class="comment">%exit perpendicular to the surface of the boxes. The electric field lines</span>
+<span class="comment">%flow through the center of the two boxes.</span>
+<span class="comment">%</span>
+<span class="comment">%The current density follows the direction of the electric field. The current</span>
+<span class="comment">%density appears to be greatest towards the center in between the two</span>
+<span class="comment">%boxes. The simulation is symmetrical about the middle of the</span>
+<span class="comment">%bottleneck.</span>
+</pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2017a</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%%Assignment 2: Part 2
+%Laplace equations will be solved in this part using finite difference.
+%% Part 2: Question A
+%The first section of this part will solve for the voltage across a frame where
+%one boundary is set to a fixed 1 volt and the opposing edge of the frame
+%is set to a fixed 0 volts. However we have heterogeneous material where
+%the conductivity changes. Two boxes will be in the frame with a
+%conductivity less than the conductivity outside of the box. 
+
+clc
+
+%Set Frame Size 
+
+L=30;
+nx = 2*L/3;
+ny = L;
+
+%Voltage at boundary
+vx=1;
+
+G = sparse(nx*ny);
+v = zeros(1,nx*ny);
+
+%Conductivity outside either box
+sig1 = 1;
+%Conductivity inside a box 
+sig2 = 1e-2;
+
+%Establish dimensions of each box
+
+% [Left side, right side, top of box, bottom of box]
+
+box1 = [nx*2/5 nx*3/5 ny ny*3/5];
+box2 = [nx*2/5 nx*3/5 ny*2/5 0];
+
+%% 1. Distribution of conductivity in material
+sigma=ones(nx,ny);
+for i=1:nx
+    for j=1:ny
+        if(i > box1(1) && i < box1(2) && (j < box2(3)||j > box1(4)))
+            sigma(i,j)=1e-2;
+        end
+    end
+end
+
+%Plot #1: Conductivity in Frame
+figure(1)
+surface(sigma)
+title('Part2: Sigma Plot')
+
+%% 2. Build G matrix and plot Voltage Map
+for i=1:nx
+   for j = 1:ny %Along fixed boundary (left side)
+       n=j+(i-1)*ny; 
+       
+       if(i==1)
+           G(n,:)=0;
+           G(n,n)=1;
+           v(n)=vx;
+           
+       elseif(i==nx)%Along fixed boundary (right side)
+           G(n,:)=0;
+           G(n,n)=1;
+           v(n)=0;
+           
+       elseif (j == 1) %Along unfixed boundary (bottom)
+           
+           if (i > box1(1) && i < box1(2)) %Inside Box
+                G(n, n) = -3;
+                G(n, n+1) = sig2;
+                G(n, n+ny) = sig2;
+                G(n, n-ny) = sig2;
+                
+            else %Outside box
+                G(n, n) = -3;
+                G(n, n+1) = sig1;
+                G(n, n+ny) = sig1;
+                G(n, n-ny) = sig1;
+                
+            end
+       elseif (j == ny) %Along unfixed boundary (top)
+           
+           if (i > box1(1) && i < box1(2)) %Inside Box
+                G(n, n) = -3;
+                G(n, n-1) = sig2;
+                G(n, n+ny) = sig2;
+                G(n, n-ny) = sig2;
+                
+           else %Outside Box
+                G(n, n) = -3;
+                G(n, n-1) = sig1;
+                G(n, n+ny) = sig1;
+                G(n, n-ny) = sig1;
+                
+           end
+            
+       else %Not along any boundary, in the middle of the frame 
+           
+           if (i > box1(1) && i < box1(2) && (j < box2(3)||j > box1(4)))
+               %Inside a box
+                G(n, n) = -4;
+                G(n, n+1) = sig2;
+                G(n, n-1) = sig2;
+                G(n, n+ny) = sig2;
+                G(n, n-ny) = sig2;
+                
+            else %Outside a box 
+                G(n, n) = -4;
+                G(n, n+1) = sig1;
+                G(n, n-1) = sig1;
+                G(n, n+ny) = sig1;
+                G(n, n-ny) = sig1;
+                
+           end
+            
+       end
+       
+   end
+end
+%G matrix made
+%Solve for solution 
+temp=G\v';
+
+%Backmap 'temp' vector into a physical (readable) matrix 
+vmap=zeros(nx,ny);
+for i=1:nx
+    
+    for j=1:ny
+         n=j+(i-1)*ny;
+         vmap(i,j)=temp(n);  
+         
+    end
+        
+end
+
+%Plot the voltage map of frame
+figure(2)
+surf(vmap)
+title("Part 2: Voltage Map across Frame")
+
+%% 3.Electric Field 
+%Electric Field is the gradient of the voltage
+%Generate two matrices, each contains the gradient with respect to a
+%direction
+[Ex,Ey]=gradient(vmap);
+
+%Plot X-coordinate Electric Field
+figure(3)
+surface(Ex)
+title('X-Coordinate Electric Field')
+
+%Plot the Y-coordinate Electric Field
+figure(4)
+surface(Ey)
+title('Y-Coordinate Electric Field')
+
+%Combine the X- and Y- electric field with quiver, shows direction
+%(magnitude isnt as obvious however)
+figure(5)
+quiver(Ex,Ey)
+title('Electric Field')
+axis tight
+
+%% 4. Current Density 
+%Current is electric field multiplied by conductivity
+%Solve for current in x-direction
+Jx=Ex.*sigma;
+
+%Solve for current in y-direction
+Jy=Ey.*sigma;
+
+%'quiver-plot' of the currents
+figure(6)
+quiver(Jx,Jy)
+title('Quiver Current Density Through Frame')
+axis tight
+
+%Jx and Jy are orthogonal 
+%Plot the total magnitude of the currents
+Jtotal=(Jx.^2+Jy.^2).^0.5;
+figure(7)
+surface(Jtotal)
+title('Surface Plot of Current Density Magnitude (No Direction Indicated)')
+axis tight
+
+%% Summary
+%As expected for the conductivity map, the conductivity is uniform through
+%the entire frame except at the two boxes. At the two boxes, the
+%conductivity drops to 1e-2
+%
+%The voltage map is similar to what was seen in part 1 question 'a' as
+%there is a linear increasing voltage from one boundary to the next.
+%However the presence of the two boxes disrupts the uniformity. The voltage
+%increases in a parabolic shape between the two boxes .
+%
+%The electric (x- and y-) fields represents the gradient of the voltage
+%field. The quiver of the two plots show that the electric field lines
+%exit perpendicular to the surface of the boxes. The electric field lines
+%flow through the center of the two boxes.
+%
+%The current density follows the direction of the electric field. The current
+%density appears to be greatest towards the center in between the two
+%boxes. The simulation is symmetrical about the middle of the
+%bottleneck. 
+
+##### SOURCE END #####
+--></body></html>
